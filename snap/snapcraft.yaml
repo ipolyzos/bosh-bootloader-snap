@@ -8,7 +8,7 @@
 # Snap author: Ioannis Polyzos 
 
 name: bbl
-version: 'v7.0.13'
+version: 'v7.0.8'
 summary: bbl Snap package 
 description: |
   Command line utility for standing up a BOSH director on an IAAS of your choice.
