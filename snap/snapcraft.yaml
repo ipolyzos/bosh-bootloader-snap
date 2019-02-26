@@ -1,0 +1,57 @@
+# Description: 
+#   Snap package for the bosh bootleader CLI. a utility for standing up a BOSH director on an IAAS of your choice.  
+#
+# Project page: https://github.com/cloudfoundry/bosh-bootloader
+# Documentation: https://github.com/cloudfoundry/bosh-bootloader/tree/master/docs
+# Tracker: https://www.pivotaltracker.com/n/projects/1488988
+#
+# Snap author: Ioannis Polyzos 
+
+name: bbl
+version: 'v5.4.0'
+summary: bbl Snap package 
+description: |
+  Command line utility for standing up a BOSH director on an IAAS of your choice.
+
+grade: stable 
+confinement: strict 
+
+parts:
+parts:
+  terraform:
+    source: https://github.com/hashicorp/terraform.git
+    source-tag: v0.11.10
+    plugin: go
+    go-importpath: github.com/hashicorp/terraform
+    go-packages: [github.com/hashicorp/terraform]
+    go-buildtags: [core]
+    after: [go]
+  go:
+    source-tag: go1.11
+
+  bbl:
+    source-type: git
+    source: https://github.com/cloudfoundry/bosh-bootloader
+    source-tag: ${SNAPCRAFT_PROJECT_VERSION}
+    plugin: go 
+    go-importpath: github.com/cloudfoundry/bosh-bootloader
+    override-build: |
+      export GOPATH=$(realpath ../go)
+      mkdir -p ${SNAPCRAFT_PART_INSTALL}/bin/
+      cd ${GOPATH}/src/github.com/cloudfoundry/bosh-bootloader
+      GOBUILDTAGS="${GOBUILDTAGS:-""}"
+      go build -tags="${GOBUILDTAGS}" -ldflags="-X main.Version=$(git rev-parse --short=6 HEAD)" -o ${SNAPCRAFT_PART_INSTALL}/bin/bbl ./bbl/
+      chmod +x ${SNAPCRAFT_PART_INSTALL}/bin/bbl
+
+apps:
+  terraform:
+    command: terraform
+    plugs: 
+      - home
+      - network]
+  
+  bbl:
+    command: bin/bbl
+    plugs:
+      - home 
+      - network
